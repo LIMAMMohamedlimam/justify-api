@@ -1,0 +1,68 @@
+import { Router, Request, Response } from "express";
+import jwt from "jsonwebtoken";
+import { user } from "../../../types.js";
+import { redisClient } from "../../redis/redisClient.js";
+import { findUserByEmail , createUser } from "../../models/user.js";
+
+
+
+
+export const authRouter = Router() ;
+
+// Load JWT secret from environment variables
+const JWT_SECRET = process.env.JWT_SECRET || "fallback";
+const JWT_EXPIRATION = "10m"; 
+
+// token endpoint to authenticate user and provide a token
+authRouter.post("/token", async (req: Request, res: Response) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: "Email is required" });
+  }
+
+    // TODO : validate and sanitize email
+
+
+  let user : user | null = await  findUserByEmail(email); 
+
+  // If user does not exist, create a new one
+
+  if (user == null) {
+    try {
+      user = await createUser(email);
+    } catch (error) {
+      return res.status(500).json({ error: "User creation failed" });
+    }
+  }
+
+
+  // Generate a token for the user
+  const token = await createSession(user.id);
+
+  console.log(`User ${user.email} authenticated, token: ${token}`);
+
+  // Create and Store the session/token in Redis 
+  await createSession(user.id);
+  
+  // Return the token to the client
+  return res.json({ token });
+});
+
+
+
+export async function createSession(userId:string): Promise<string> {
+
+  // Generate JWT token
+  const token = jwt.sign({ userId }, JWT_SECRET, { expiresIn: JWT_EXPIRATION });
+
+  // Store the token in Redis with an expiration time (e.g., 15 minutes)
+  await redisClient.setEx(token, 15 * 60, String(userId));
+
+  return token;
+}
+
+// Revoke a token
+export async function revokeSession(token: string) : Promise<void> {
+  await redisClient.del(token);
+}
