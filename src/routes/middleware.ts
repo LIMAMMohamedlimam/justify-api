@@ -21,7 +21,6 @@ export async function authenticateToken(req: AuthenticatedRequest,
 ): Promise<Response<any, Record<string, any>> | void>  {
   const authHeader = req.headers["authorization"];
   const jwt_token = authHeader && authHeader.split(" ")[1]; // "Bearer <token>"
-  console.log("Authenticating token:", jwt_token);
 
 
   if (!jwt_token) return res.status(401).json({ error: "Token required" }); // 401 Unauthorized
@@ -29,7 +28,6 @@ export async function authenticateToken(req: AuthenticatedRequest,
   // Vérification du token JWT
   try {
     const payload: any = jwt.verify(jwt_token, JWT_SECRET);
-    console.log("Token payload:", payload);
 
     // Verification de l'acitvité du token dans Redis
     const exists = await redisClient.exists(jwt_token);
@@ -66,7 +64,6 @@ export async function checkRateLimit(req: AuthenticatedRequest, res: Response, n
 
     // Check balance in Redis
     let balance = await redisClient.get(`balance:${jwt_token}`);
-    console.log(`Balance from Redis for token ${jwt_token}:`, balance);
     let balanceNum: number | null = null;
     
     if (balance === null) {
@@ -92,11 +89,9 @@ export async function checkRateLimit(req: AuthenticatedRequest, res: Response, n
     balanceNum -= textLength;
     await redisClient.set(`balance:${jwt_token}`, balanceNum, { EX: 3600 });
 
-    console.log(`token ${jwt_token} has balance: ${balanceNum}, text length: ${textLength}`);
 
     // Deduct balance in PostgreSQL
     await updateTokenBalance(jwt_token, balanceNum);
-    console.log(`token ${jwt_token} balance updated in DB to: ${balanceNum}`);
 
     next();
   } catch (err) {

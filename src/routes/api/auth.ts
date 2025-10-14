@@ -53,7 +53,6 @@ authRouter.post("/token", async (req: Request, res: Response) => {
   // Generate a token for the user
   // const token = await createSession(user.id);
 
-  console.log(`token with ${token.email} authenticated`);
 
   
   // Return the token to the client
