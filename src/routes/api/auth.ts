@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { Token } from "../../../types.js";
+import { Token } from "../../types.js";
 import { redisClient } from "../../redis/redisClient.js";
 import { isValidEmail, sanitizeEmail } from "../../utils/emailValidator.js";
 import {  createToken, deleteToken, findTokenByEmail } from "../../models/token.js";
@@ -139,7 +139,7 @@ export async function createSession(jwt_token:string): Promise<string> {
  
 
   // Store the token in Redis with an expiration time (e.g., 15 minutes)
-  await redisClient.setEx(jwt_token, 1 * 60, String(jwt_token));
+  await redisClient.setEx(jwt_token, 24* 60 * 60, String(jwt_token));
 
   return jwt_token;
 }

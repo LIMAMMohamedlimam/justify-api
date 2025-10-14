@@ -1,5 +1,5 @@
 import { pool } from "../db/db.js";
-import type { Token } from "../../types.js";
+import type { Token } from "../types.js";
 
 
 // Create a new token for a user with an expiration date
