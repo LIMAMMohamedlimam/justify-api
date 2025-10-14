@@ -3,6 +3,7 @@ import { apiRouter } from "./routes/index.js";
 import { initDatabase } from "./db/init.js";
 
 import dotenv from "dotenv";
+import { setupSwagger } from "./swagger.js";
 dotenv.config();
 
 
@@ -23,6 +24,8 @@ app.use((req: Request, res: Response, next) => {
 
 // Use the API router for all /api routes
 app.use("/api", apiRouter);
+
+setupSwagger(app);
 
 // Initialize DB tables
 initDatabase();

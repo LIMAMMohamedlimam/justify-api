@@ -15,6 +15,37 @@ const JWT_SECRET = process.env.JWT_SECRET || "fallback";
 const JWT_EXPIRATION = "10m"; 
 
 // token endpoint to authenticate user and provide a token
+/**
+ * @swagger
+ * /token:
+ *   post:
+ *     summary: Authenticate user and get a token
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: "foo@gmail.com"
+ *     responses:
+ *       200:
+ *         description: Successful authentication
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *       400:
+ *         description: Bad Request - Missing or invalid email
+ *       500:
+ *         description: Internal Server Error - User creation failed
+ */
 authRouter.post("/token", async (req: Request, res: Response) => {
   const { email } = req.body;
 
