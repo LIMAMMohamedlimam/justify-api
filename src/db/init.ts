@@ -13,7 +13,6 @@ export async function initDatabase() {
     const sql = fs.readFileSync(filePath, "utf-8");
     await pool.query(sql);
 
-    console.log("Database initialized from schema.sql");
   } catch (err) {
     console.error("Error initializing database:", err);
   }

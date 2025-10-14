@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { user } from "../../../types.js";
 import { redisClient } from "../../redis/redisClient.js";
 import { findUserByEmail , createUser } from "../../models/user.js";
+import { isValidEmail, sanitizeEmail } from "../../utils/emailValidator.js";
 
 
 
@@ -21,7 +22,9 @@ authRouter.post("/token", async (req: Request, res: Response) => {
     return res.status(400).json({ error: "Email is required" });
   }
 
-    // TODO : validate and sanitize email
+  //  validate and sanitize email
+  const sanitizedEmail = sanitizeEmail(email)
+  if (!isValidEmail(sanitizedEmail)) return res.status(400).json({ error: "Invalid email" }); 
 
 
   let user : user | null = await  findUserByEmail(email); 
@@ -40,7 +43,7 @@ authRouter.post("/token", async (req: Request, res: Response) => {
   // Generate a token for the user
   const token = await createSession(user.id);
 
-  console.log(`User ${user.email} authenticated, token: ${token}`);
+  console.log(`User ${user.email} authenticated`);
 
   // Create and Store the session/token in Redis 
   await createSession(user.id);

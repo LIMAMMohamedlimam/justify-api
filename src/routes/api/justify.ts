@@ -1,22 +1,28 @@
 import { Router, Request, Response } from "express";
 import { authenticateToken, checkRateLimit } from "../middleware.js";
 
+import { validateText } from "../../utils/textvalidator.js";
+
+
 export const justifyRouter = Router();
+
+
+
 
 justifyRouter.post("/", authenticateToken, checkRateLimit,  (req: Request, res: Response) => {
 
-  // Vérifie que le texte est présent dans le corps de la requête
-  const text  = req.body;
+    // Validate and sanitize input
+    const { success, data , error } = validateText(req.body);
+    if (!success) {
+        return res.status(400).json({ error: error.errors ? error.errors.map((e:any) => e.message) : 'Invalid input' });
+    }
+    const text = data as string;
+    // Verification du limite d'usage
 
-  // TODO : sanitize input
-  if (!text) return res.status(400).json({ error: "Text is required" });
-
-  // Verification du limite d'usage
-
-  // Justifcation du texte
-  const words = text.split(/\s+/).filter(Boolean);
-  const justifiedText = justifyText(words , 80).join("\n"); 
-  res.json({ justifiedText });
+    // Justifcation du texte
+    const words = text.split(/\s+/).filter(Boolean);
+    const justifiedText = justifyText(words , 80).join("\n"); 
+    res.json({ justifiedText });
 });
 
 
@@ -32,7 +38,7 @@ justifyRouter.post("/", authenticateToken, checkRateLimit,  (req: Request, res: 
  */
 
 // Justify text to a given width
-function justifyText (words : string[], maxWidth:number) {
+export function justifyText (words : string[], maxWidth:number) {
     const result = [];
     let line : string[] = [];
     let lineLength = 0;

@@ -15,7 +15,6 @@ export async function createUser(email: string) : Promise<user> {
     "INSERT INTO users (id,email,balance) VALUES ($1,$2,$3) RETURNING *",
     [id,email,balance]
   );
-  console.log(result.rows);
 
   if (!result.rows[0]) throw new Error("User creation failed");
 

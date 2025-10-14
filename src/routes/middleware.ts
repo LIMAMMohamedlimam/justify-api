@@ -55,13 +55,11 @@ export async function checkRateLimit(req: AuthenticatedRequest, res: Response, n
 
     // Check balance in Redis
     let balance = await redisClient.get(`balance:${userId}`);
-    console.log("Balance from Redis:", balance);
     let balanceNum: number | null = null;
     
     if (balance === null) {
       // Not in Redis, fetch from database
         balanceNum = await getUserBalance(userId); 
-        console.log("Balance from DB:", balanceNum);
       if (balanceNum === null) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -73,7 +71,6 @@ export async function checkRateLimit(req: AuthenticatedRequest, res: Response, n
       balanceNum = parseInt(balance, 10);
     }
 
-    console.log(`User ${userId} has balance: ${balanceNum}, text length: ${textLength}`);
 
     if (balanceNum < textLength) {
       return res.status(402).json({ error: "Insufficient balance" });
@@ -82,6 +79,8 @@ export async function checkRateLimit(req: AuthenticatedRequest, res: Response, n
     // Deduct balance in Redis
     balanceNum -= textLength;
     await redisClient.set(`balance:${userId}`, balanceNum, { EX: 3600 });
+
+    console.log(`User ${userId} has balance: ${balanceNum}, text length: ${textLength}`);
 
     // Deduct balance in PostgreSQL
     await db.query("UPDATE users SET balance = $1 WHERE id = $2", [balanceNum, userId]);
