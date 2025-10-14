@@ -1,17 +1,12 @@
 
 
-type user = {
-    id: string;
+type Token = {
+    user_id: string;
     email: string;
+    token: string;
     balance: number;
     last_reset: Date;
 };
+  
 
-
-type token = {
-    user_id: string;
-    token: string;
-    expiration_date: Date;
-};
-
-export { user, token };
+export {  Token };
