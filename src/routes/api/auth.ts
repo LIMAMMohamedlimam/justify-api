@@ -3,8 +3,10 @@ import jwt from "jsonwebtoken";
 import { Token } from "../../../types.js";
 import { redisClient } from "../../redis/redisClient.js";
 import { isValidEmail, sanitizeEmail } from "../../utils/emailValidator.js";
-import {  createToken, findTokenByEmail } from "../../models/token.js";
+import {  createToken, deleteToken, findTokenByEmail } from "../../models/token.js";
 import { v4 as uuidv4 } from "uuid";
+import { ca } from "zod/v4/locales";
+import { uuid } from "zod";
 
 
 
@@ -64,25 +66,60 @@ authRouter.post("/token", async (req: Request, res: Response) => {
 
   if (token == null) {
     try {
-      const user_id : string = uuidv4()
+      const id : string = uuidv4()
       const jwt_token = generateJwtToken(sanitizedEmail);
       token = await createToken(
-        user_id,
+        id,
         sanitizedEmail,
         jwt_token,
         new Date(),
         80000
       );
     } catch (error) {
-      return res.status(500).json({ error: "User creation failed" });
+      return res.status(500).json({ error: "Token creation failed" });
+    }
+  }
+
+  // If token exists, verify it
+  try{
+
+    const payload: any = jwt.verify(token.token, JWT_SECRET);
+
+  } catch (err) {
+
+    if (err instanceof jwt.TokenExpiredError) {
+
+      // delete the old token from DB
+      await deleteToken(token.token);
+      // Token expired, generate a new one
+      const id = uuidv4();
+      const new_jwt_token = generateJwtToken(sanitizedEmail);
+      token.token = new_jwt_token;
+      token.last_reset = new Date();
+      token.balance = 80000; // reset balance
+
+      
+
+      // Update token in DB
+      await createToken(
+        token.id,
+        sanitizedEmail,
+        new_jwt_token,
+        token.last_reset,
+        token.balance
+      );
+    } else {
+      return res.status(500).json({ error: "Token verification failed" });
     }
   }
 
   const jwt_token = token.token
 
+  // check expiration
+
 
   // Generate a token for the user
-  // const token = await createSession(user.id);
+  // const token = await createSession(jwt_token);
 
 
   
@@ -102,7 +139,7 @@ export async function createSession(jwt_token:string): Promise<string> {
  
 
   // Store the token in Redis with an expiration time (e.g., 15 minutes)
-  await redisClient.setEx(jwt_token, 15 * 60, String(jwt_token));
+  await redisClient.setEx(jwt_token, 1 * 60, String(jwt_token));
 
   return jwt_token;
 }

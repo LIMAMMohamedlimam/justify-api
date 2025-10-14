@@ -3,12 +3,12 @@ import type { Token } from "../../types.js";
 
 
 // Create a new token for a user with an expiration date
-export async function createToken(user_id: string,email : string,  jwt_token: string, last_reset: Date, balance:number) : Promise<Token> {
+export async function createToken(id: string,email : string,  jwt_token: string, last_reset: Date, balance:number) : Promise<Token> {
   const result = await pool.query(
     `INSERT INTO tokens (id, email, token,balance,last_reset)
      VALUES ($1, $2, $3,$4,$5)
      RETURNING *`,
-    [user_id,email, jwt_token,balance,last_reset]
+    [id,email, jwt_token,balance,last_reset]
   );
   return result.rows[0];
 }
@@ -43,6 +43,11 @@ export async function resetTokenBalance(jwt_token: string, defaultBalance: numbe
     "UPDATE tokens SET balance = $1, last_reset = CURRENT_TIMESTAMP WHERE token = $2",
     [defaultBalance, jwt_token]
   );
+}
+
+// Revoke (delete) a token
+export async function deleteToken(jwt_token: string) : Promise<void> {
+  await pool.query("DELETE FROM tokens WHERE token = $1", [jwt_token]);
 }
 
 // Delete expired tokens

@@ -1,7 +1,7 @@
 
 
 type Token = {
-    user_id: string;
+    id: string;
     email: string;
     token: string;
     balance: number;

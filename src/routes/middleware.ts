@@ -24,10 +24,14 @@ export async function authenticateToken(req: AuthenticatedRequest,
 
 
   if (!jwt_token) return res.status(401).json({ error: "Token required" }); // 401 Unauthorized
+  console.log("Received token:", jwt_token);
+
+  
 
   // Vérification du token JWT
   try {
     const payload: any = jwt.verify(jwt_token, JWT_SECRET);
+    console.log("Payload:", payload);
 
     // Verification de l'acitvité du token dans Redis
     const exists = await redisClient.exists(jwt_token);
@@ -40,7 +44,8 @@ export async function authenticateToken(req: AuthenticatedRequest,
     await createSession(payload.email); // Refresh session in Redis
     
     next();
-  } catch {
+  } catch (err) {
+    if (err instanceof jwt.TokenExpiredError) return res.status(403).json({ error: "Token expired" });
     return res.status(403).json({ error: "Invalid token" });
   }
 }
