@@ -69,9 +69,26 @@ npm install
 
 Configurez les variables d'environnement: 
 ```bash
-PORT=3000
-DATABASE_URL=postgres://user:password@localhost:5432/dbname
-JWT_SECRET=votre_secret_jwt
+# Clé secrète pour la génération de tokens JWT
+JWT_SECRET=test-justify-secret
+
+
+# Port d'écoute de l'API
+PORT=80
+
+
+# Configuration Redis
+REDIS_HOST=localhost # Nom du service Redis dans Docker Compose
+REDIS_PORT=6379 # Port interne Redis
+
+
+# Configuration base de données PostgreSQL
+DATABASE_HOST=localhost # Adresse du serveur DB (docker : db)
+DATABASE_PORT=5432 # Port interne PostgreSQL
+DATABASE_USER=justifyuser # Nom d'utilisateur pour la DB
+DATABASE_PASSWORD=securepassword # Mot de passe pour la DB
+DATABASE_NAME=justifydb # Nom de la base de données
+
 ```
 ---
 ### ⚡ Scripts
