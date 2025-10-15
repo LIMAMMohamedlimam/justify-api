@@ -1,6 +1,10 @@
 # Justify API
 Documentation de l’API de justification de texte. Cette API gère l’authentification, la justification de texte et le quota d’utilisation par token.
 
+## Pour accéder a la version live c'est sur 
+### **```http://16.171.24.111/api/{token or justify}```**
+
+
 ## Table des Matières
 -[1. Authentification & justification du texte](#authentification)
 
@@ -58,6 +62,7 @@ PORT=3000
 DATABASE_URL=postgres://user:password@localhost:5432/dbname
 JWT_SECRET=votre_secret_jwt
 ```
+---
 ### ⚡ Scripts
 Script	Description : 
 ```bash
@@ -66,6 +71,7 @@ npm run build	    #Compile le TypeScript en JavaScript
 npm start	    #Exécute le serveur compilé depuis dist
 npm test	    #Lance les tests avec Jest
 ```
+---
 ## 📝 API Documentation 
 
 ## Authentification & justification du texte
@@ -96,7 +102,13 @@ npm test	    #Lance les tests avec Jest
 
 ***Body (texte brut) :***
 ```
-Longtemps, je me suis couché de bonne heure. Parfois, à peine ma bougie éteinte, mes yeux se fermaient si vite que je n’avais pas le temps de me dire: «Je m’endors.» Et, une demi-heure après, la pensée qu’il était temps de chercher le sommeil m’éveillait; je voulais poser le volume que je croyais avoir dans les mains et souffler ma lumière; je n’avais pas cessé en dormant de faire des réflexions sur ce que je venais de lire, mais ces réflexions avaient pris un tour un peu particulier; il me semblait que j’étais moi-même ce dont parlait l’ouvrage: une église, un quatuor, la rivalité de François Ier et de Charles-Quint. 
+Longtemps, je me suis couché de bonne heure. Parfois, à peine ma bougie éteinte, mes yeux se
+fermaient si vite que je n’avais pas le temps de me dire: «Je m’endors.» Et, une demi-heure après,
+la pensée qu’il était temps de chercher le sommeil m’éveillait; je voulais poser le volume que je
+croyais avoir dans les mains et souffler ma lumière; je n’avais pas cessé en dormant de faire des
+réflexions sur ce que je venais de lire, mais ces réflexions avaient pris un tour un peu 
+particulier; il me semblait que j’étais moi-même ce dont parlait l’ouvrage: 
+une église, un quatuor, la rivalité de François Ier et de Charles-Quint. 
 ```
 ***Réponse (texte brut justifié) :***
 ```
@@ -116,7 +128,7 @@ vous pouvez retrouver également la documentation via Swagger UI
 ```
 http://localhost:3000/api-docs
 ```
-
+---
 
 ## 🧪 Tests
 
@@ -126,14 +138,81 @@ npm test
 ```
 Les tests utilisent Jest avec le support ESM
 
+---
+### 🔑 Variables d'Environnement
+
+Le projet utilise un fichier .env pour configurer les services. Voici la description des principales variables (a récrée lors du premier lancement) :
+
+```bash
+# Clé secrète pour la génération de tokens JWT
+JWT_SECRET=test-justify-secret
+
+
+# Port d'écoute de l'API
+PORT=80
+
+
+# Configuration Redis
+REDIS_HOST=redis # Nom du service Redis dans Docker Compose
+REDIS_PORT=6379 # Port interne Redis
+
+
+# Configuration base de données PostgreSQL
+DATABASE_HOST=localhost # Adresse du serveur DB (docker : db)
+DATABASE_PORT=5432 # Port interne PostgreSQL
+DATABASE_USER=justifyuser # Nom d'utilisateur pour la DB
+DATABASE_PASSWORD=securepassword # Mot de passe pour la DB
+DATABASE_NAME=justifydb # Nom de la base de données
+```
+
+---
 ## 🐳 Docker
 
-La configuration Docker sera ajoutée prochainement – cette section inclura les instructions pour construire et exécuter le conteneur.
+Le projet utilise Docker pour simplifier le développement et le déploiement. Il inclut une API Node.js, une base de données PostgreSQL et un cache Redis.
 
-## ⚙️ CI/CD
+### Prérequis
 
-La configuration GitHub Actions sera ajoutée prochainement – cette section détaillera l'exécution automatique des tests, la compilation et le déploiement sur AWS.
+Assurez-vous d'avoir installé :
 
+- [Docker](https://www.docker.com/get-started)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+### Construction et lancement avec Docker Compose
+
+1. Clonez le dépôt et accédez au dossier du projet :
+
+```bash
+git https://github.com/LIMAMMohamedlimam/justify-api.git
+cd justify-api/
+```
+
+2. Construisez et démarrez tous les conteneurs :
+
+```bash
+docker-compose up --build
+or
+docker compose up --build
+```
+
+Les services suivants seront lancés :
+
+- **api** : l'API Node.js sur le port `80`
+- **db** : base de données PostgreSQL sur le port `5433` 
+- **redis** : serveur Redis sur le port `9001` 
+
+3. Arrêtez les conteneurs :
+
+```bash
+docker-compose down
+```
+
+### Remarques
+
+- Les données de la base sont persistées via un volume Docker (`pgdata`).
+- Les variables d'environnement sont chargées depuis `.env`  et peuvent être surchargées dans `docker-compose.yml`.
+- Une fois les conteneurs lancés, accédez à l'API via `http://<HOST>`.
+
+---
 ## 📂 Structure du Projet
 
 ```
@@ -149,10 +228,3 @@ justify-api/
 ├─ tsconfig.json
 └─ README.md
 ```
-
-### 🔑 Variables d'Environnement
-
-```PORT``` :	Port du serveur (par défaut : 3000)
-```DATABASE_URL```	Chaîne de connexion PostgreSQL
-``JWT_SECRET``	Clé secrète pour l'authentification JWT
-```REDIS_URL```  Chaîne de connexion Redis
