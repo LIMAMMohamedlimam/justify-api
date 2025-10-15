@@ -6,11 +6,22 @@ Documentation de l’API de justification de texte. Cette API gère l’authenti
 
 
 ## Table des Matières
--[1. Authentification & justification du texte](#authentification)
 
-  -[1.1 Obtenir un token](#obtenir-un-token)
-  
-  -[1.2 Accéder à l’API justify avec un token](#justifier-un-texte)
+- [1. Authentification & justification du texte](#1-authentification--justification-du-texte)  
+  - [1.1 Obtenir un token](#11-obtenir-un-token)  
+  - [1.2 Justifier un texte](#12-justifier-un-texte)  
+- [2. Fonctionnalités](#2-🚀-fonctionnalités)  
+- [3. Stack Technique](#3-🛠️-stack-technique)  
+- [4. Installation](#4-📦-installation)  
+- [5. Scripts](#5-⚡-scripts)  
+- [6. API Documentation](#6-📝-api-documentation)  
+- [7. Tests](#7-🧪-tests)  
+- [8. Variables d'environnement](#8-🔑-variables-denvironnement)  
+- [9. Docker](#9-🐳-docker)  
+  - [9.1 Prérequis](#91-prérequis)  
+  - [9.2 Construction et lancement avec Docker Compose](#92-construction-et-lancement-avec-docker-compose)  
+  - [9.3 Remarques](#93-remarques)  
+- [10. Structure du Projet](#10-📂-structure-du-projet)  
 
 
 ---
@@ -48,7 +59,7 @@ Documentation de l’API de justification de texte. Cette API gère l’authenti
 Clonez le dépôt :
 
 ```bash
-git clone https://github.com/votreutilisateur/justify-api.git
+git clone https://github.com/LIMAMMohamedlimam/justify-api.git
 cd justify-api
 ```
 Installez les dépendances :
